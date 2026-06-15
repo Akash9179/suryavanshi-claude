@@ -1,0 +1,15 @@
+# Never sync personal or machine-specific data
+memory/
+projects/
+settings.local.json
+*.local.json
+
+# Secrets
+.env
+.env.*
+*.key
+*.pem
+
+# OS / editor noise
+.DS_Store
+*.swp
