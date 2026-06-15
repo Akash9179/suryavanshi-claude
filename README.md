@@ -72,6 +72,54 @@ receiving machine.
 
 ---
 
+## 🧰 What you get
+
+Setting up this repo gives every machine the same toolbox. It comes from three
+places:
+
+### 1. gstack — planning, review, ship & browser QA
+
+Cloned into `~/.claude/skills/gstack/`. A large suite of workflow skills:
+
+| Area | Skills |
+| --- | --- |
+| **Plan & review** | `/plan-ceo-review` · `/plan-eng-review` · `/plan-design-review` · `/plan-devex-review` · `/review` · `/autoplan` · `/spec` |
+| **Ship & deploy** | `/ship` · `/land-and-deploy` · `/canary` · `/setup-deploy` |
+| **Design** | `/design-consultation` · `/design-shotgun` · `/design-html` · `/design-review` |
+| **QA & browser** | `/browse` · `/qa` · `/qa-only` · `/connect-chrome` · `/setup-browser-cookies` |
+| **iOS** | `/ios-qa` · `/ios-fix` · `/ios-design-review` · `/ios-sync` · `/ios-clean` |
+| **Ops & misc** | `/investigate` · `/cso` · `/benchmark` · `/retro` · `/document-release` · `/codex` · `/freeze` · `/guard` · `/learn` · `/gstack-upgrade` |
+
+> For **all** web browsing, use `/browse` from gstack.
+
+### 2. Plugins — from the official & community marketplaces
+
+Installed automatically by `install.sh`:
+
+| Plugin | What it adds |
+| --- | --- |
+| **superpowers** | Core engineering workflow: brainstorming, TDD, systematic debugging, writing & executing plans, code review, git worktrees |
+| **vercel** | Deploying, Next.js, AI SDK, storage, env vars, CLI, and more |
+| **supabase** | Database, auth, edge functions, migrations, RLS |
+| **playwright** | Browser automation & testing |
+| **frontend-design** | Distinctive, production-grade UI generation |
+| **firecrawl** | Web search, scraping, crawling, structured extraction |
+| **claude-md-management** | Audit & improve `CLAUDE.md` files |
+| **claude-code-setup** | Recommend hooks, subagents, skills, MCP servers |
+| **andrej-karpathy-skills** | Guidelines to reduce common LLM coding mistakes |
+| **swift-lsp** / **rust-analyzer-lsp** | Language servers for Swift & Rust |
+
+### 3. Custom skills — ours, in this repo
+
+Anything we add under [`skills/`](./skills/). Currently a starter `_template`
+to copy from. As we build skills, they're listed here automatically once linked.
+
+> **Not included:** personal/project-specific tools (e.g. local-only skills like
+> graphify) and project context (Nitecapp, etc.) are deliberately kept out — see
+> [What stays private](#-what-stays-private).
+
+---
+
 ## 🚀 Get set up
 
 On a new machine (or for a teammate who's been added to the repo):
