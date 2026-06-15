@@ -69,6 +69,7 @@ receiving machine.
 | `settings.shared.json`   | Baseline settings: plugins, marketplaces, safety rules, sync hook |
 | `sync.sh`                | Pulls latest + links skills into `~/.claude/skills/`              |
 | `install.sh`             | One-shot setup for a new machine or teammate                       |
+| `list-skills.sh`         | Regenerates the custom-skills list in this README from `skills/`  |
 
 ---
 
@@ -111,12 +112,12 @@ Installed automatically by `install.sh`:
 
 ### 3. Custom skills — ours, in this repo
 
-Anything we add under [`skills/`](./skills/). Currently a starter `_template`
-to copy from. As we build skills, they're listed here automatically once linked.
+Anything we add under [`skills/`](./skills/). Run `./list-skills.sh` to
+regenerate the list below from the `skills/` folder.
 
-> **Not included:** personal/project-specific tools (e.g. local-only skills like
-> graphify) and project context (Nitecapp, etc.) are deliberately kept out — see
-> [What stays private](#-what-stays-private).
+<!-- SKILLS:START -->
+_No custom skills yet — copy `skills/_template/` to create one._
+<!-- SKILLS:END -->
 
 ---
 
