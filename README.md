@@ -30,6 +30,12 @@ you're walking them through it by hand.
 Make a change, commit, push — and the next time anyone opens Claude Code, they
 have it.
 
+**Why this matters:** it turns our Claude Code setup into shared infrastructure
+instead of something each person tinkers with alone. There's no config drift
+between machines, onboarding a teammate takes one command instead of an
+afternoon, and every improvement someone makes compounds for the whole team —
+the setup gets better over time instead of being reinvented on each laptop.
+
 > Inspired by how [gstack](https://github.com/garrytan/gstack) is distributed:
 > one git repo of skill folders, kept current with a pull. This is a lighter,
 > private version of that idea.
