@@ -10,6 +10,9 @@ settings.local.json
 *.key
 *.pem
 
+# Per-machine opt-in to auto-pull (receiver machines only; created by install.sh)
+.autopull
+
 # OS / editor noise
 .DS_Store
 *.swp

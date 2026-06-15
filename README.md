@@ -59,9 +59,15 @@ the setup gets better over time instead of being reinvented on each laptop.
 ```
 
 A `SessionStart` hook runs [`sync.sh`](./sync.sh) every time Claude Code starts.
-That script pulls the latest from GitHub and symlinks each skill folder into
-`~/.claude/skills/`, so new skills appear automatically — no manual step on the
-receiving machine.
+That script symlinks each skill folder into `~/.claude/skills/`, and — on
+**receiver** machines — pulls the latest from GitHub first, so new skills appear
+automatically with no manual step.
+
+**Source vs. receiver machines.** Auto-pull is opt-in per machine, gated by a
+git-ignored `.autopull` marker that `install.sh` creates. Machines set up with
+`install.sh` are *receivers* (they auto-pull). A machine without the marker is a
+*source of truth*: it only ever pushes, never auto-pulls, so its setup is never
+changed from outside. To pull there, run `git pull` manually — a deliberate act.
 
 ---
 

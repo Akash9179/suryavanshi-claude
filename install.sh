@@ -66,6 +66,12 @@ if ! grep -qF "$IMPORT_LINE" "$GLOBAL_MD"; then
   printf '%s\n' "$IMPORT_LINE" | cat - "$GLOBAL_MD" > "$GLOBAL_MD.tmp" && mv "$GLOBAL_MD.tmp" "$GLOBAL_MD"
   echo "    added shared-practices import to $GLOBAL_MD"
 fi
+
+# Mark this as a receiver machine so the SessionStart hook auto-pulls here.
+# (Source-of-truth machines skip install.sh, so they never get this marker.)
+touch "$REPO/.autopull"
+echo "    enabled auto-pull on this machine (.autopull marker created)"
+
 bash "$REPO/sync.sh"
 
 echo

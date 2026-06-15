@@ -7,8 +7,12 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_SRC="$REPO/skills"
 SKILLS_DST="$HOME/.claude/skills"
 
-# 1. Pull latest, but only if a remote/upstream is configured. Never block startup.
-if git -C "$REPO" rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+# 1. Pull latest — ONLY on machines that opt in by creating a `.autopull` marker
+#    (git-ignored, per-machine). Receiver machines get it via install.sh.
+#    A "source of truth" machine omits the marker, so it never pulls and its
+#    setup is never disturbed from outside — changes there flow outward only.
+if [ -f "$REPO/.autopull" ] && \
+   git -C "$REPO" rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
   git -C "$REPO" pull --rebase --autostash -q 2>/dev/null || true
 fi
 
