@@ -105,6 +105,11 @@ Cloned into `~/.claude/skills/gstack/`. A large suite of workflow skills:
 
 > For **all** web browsing, use `/browse` from gstack.
 
+> For any **design / UI work**, consult [awesome-design-md](https://github.com/voltagent/awesome-design-md)
+> first — real `DESIGN.md` specs pulled from Apple, Airbnb, Linear, Stripe, Vercel and ~80 more — and
+> treat "high quality" / "design review" as a hard bar, defaulting to Apple/Airbnb-grade (light, simple,
+> generous whitespace, one restrained accent). Full rule in [`CLAUDE.md`](./CLAUDE.md).
+
 ### 2. Plugins — from the official & community marketplaces
 
 Installed automatically by `install.sh`:
