@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
-# Pull latest shared config and (re)link custom skills into ~/.claude/skills/.
-# Safe to run repeatedly. Invoked by the SessionStart hook on every launch.
+# Pull latest shared config, (re)link custom skills, and keep gstack's compiled
+# runtime fresh. Safe to run repeatedly. Invoked by the SessionStart hook on
+# every launch, so it stays fast: it only rebuilds gstack when something is
+# actually missing or stale.
 set -u
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_SRC="$REPO/skills"
 SKILLS_DST="$HOME/.claude/skills"
+GSTACK_DIR="$SKILLS_DST/gstack"
+export PATH="$HOME/.bun/bin:$HOME/.local/bin:$PATH"
 
-# 1. Pull latest — ONLY on machines that opt in by creating a `.autopull` marker
-#    (git-ignored, per-machine). Receiver machines get it via install.sh.
-#    A "source of truth" machine omits the marker, so it never pulls and its
+# 1. Pull latest — ONLY on machines that opt in via a `.autopull` marker
+#    (git-ignored, per-machine; receiver machines get it from install.sh).
+#    A source-of-truth machine omits the marker, so it never pulls and its
 #    setup is never disturbed from outside — changes there flow outward only.
 if [ -f "$REPO/.autopull" ] && \
    git -C "$REPO" rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
@@ -25,12 +29,33 @@ for dir in "$SKILLS_SRC"/*/; do
   link="$SKILLS_DST/$name"
 
   if [ -L "$link" ]; then
-    # Already a symlink — repoint it in case the repo moved.
-    ln -sfn "$dir" "$link"
+    ln -sfn "$dir" "$link"               # already a symlink — repoint in case the repo moved
   elif [ -e "$link" ]; then
-    # A real dir/file with this name already exists (e.g. a gstack skill). Don't clobber.
     echo "sync: skipping '$name' — a non-symlink already exists at $link" >&2
   else
     ln -s "$dir" "$link"
   fi
 done
+
+# 3. Keep gstack's runtime fresh. On receiver machines, `git pull` above can
+#    advance gstack's sources without rebuilding the compiled browse/design/pdf
+#    binaries — so /browse, /qa etc. would silently break. Rebuild only when the
+#    binary is missing or older than a tracked source, and only if bun is here.
+if [ -f "$REPO/.autopull" ] && [ -x "$GSTACK_DIR/setup" ] && command -v bun >/dev/null 2>&1; then
+  bin="$GSTACK_DIR/browse/dist/browse"
+  needs_build=0
+  if [ ! -x "$bin" ]; then
+    needs_build=1
+  else
+    # Rebuild if package.json or the lockfile is newer than the built binary.
+    for src in "$GSTACK_DIR/package.json" "$GSTACK_DIR/bun.lock"; do
+      [ -f "$src" ] && [ "$src" -nt "$bin" ] && needs_build=1
+    done
+  fi
+  if [ "$needs_build" -eq 1 ]; then
+    echo "sync: rebuilding gstack runtime (sources changed or binary missing)…" >&2
+    ( cd "$GSTACK_DIR" && ./setup ) >/dev/null 2>&1 \
+      && echo "sync: gstack rebuilt." >&2 \
+      || echo "sync: gstack rebuild FAILED — run 'cd $GSTACK_DIR && ./setup' to see why." >&2
+  fi
+fi

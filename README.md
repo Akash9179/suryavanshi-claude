@@ -22,16 +22,20 @@ Set up my Claude Code environment from the suryavanshi-claude shared repo.
 
 1. Clone https://github.com/Akash9179/suryavanshi-claude.git into ~/suryavanshi-claude
    (if the folder already exists, cd into it and `git pull` instead).
-2. Run ./install.sh from that folder and show me the output. It is idempotent,
-   so it is safe even if some of it has run before.
-3. Confirm what it did: plugin marketplaces + plugins installed, gstack cloned,
-   settings.shared.json deep-merged into ~/.claude/settings.json, the shared
-   CLAUDE.md import added to ~/.claude/CLAUDE.md, custom skills linked, and the
-   auto-pull SessionStart hook installed.
-4. Tell me to restart Claude Code so the plugins, settings, and hook load.
+2. Run ./install.sh from that folder and show me the output. It is idempotent and
+   self-repairing, so it is safe even if some of it has run before. It will
+   bootstrap prerequisites (it installs bun if missing), install the login-free
+   plugins, clone AND BUILD gstack (compiling its browse runtime for this
+   machine), deep-merge settings.shared.json into ~/.claude/settings.json, add the
+   shared CLAUDE.md import, link custom skills, and install the auto-pull hook.
+3. Your goal is a healthy setup: run ./doctor.sh and only report success when it
+   exits 0 and prints "👍 GREEN — everything installed and running". If install.sh
+   or doctor.sh reports a problem, stop and show it to me — do NOT claim success
+   while anything is red.
+4. When green, tell me to restart Claude Code so the plugins, settings, and hook load.
 
 Do not commit or push anything, and do not touch my personal memory/, projects/,
-or settings.local.json. If install.sh reports an error, stop and show it to me.
+or settings.local.json.
 ```
 
 Prefer to do it by hand? See [**Get set up**](#-get-set-up) below.
@@ -105,8 +109,9 @@ changed from outside. To pull there, run `git pull` manually — a deliberate ac
 | `skills/_template/`      | Copy this to start a new skill (underscore folders aren't synced) |
 | `CLAUDE.md`              | Shared working practices, imported into each machine's global config |
 | `settings.shared.json`   | Baseline settings: plugins, marketplaces, safety rules, sync hook |
-| `sync.sh`                | Pulls latest + links skills into `~/.claude/skills/`              |
-| `install.sh`             | One-shot setup for a new machine or teammate                       |
+| `sync.sh`                | Pulls latest + links skills + rebuilds gstack runtime when stale  |
+| `install.sh`             | One-shot setup for a new machine or teammate (idempotent, self-repairing) |
+| `doctor.sh`              | Health-check gate — green 👍 only when everything is built & wired |
 | `list-skills.sh`         | Regenerates the custom-skills list in this README from `skills/`  |
 
 ---
@@ -138,20 +143,27 @@ Cloned into `~/.claude/skills/gstack/`. A large suite of workflow skills:
 
 ### 2. Plugins — from the official & community marketplaces
 
-Installed automatically by `install.sh`:
+**Enabled for everyone by `install.sh`** (no login or API key required):
 
 | Plugin | What it adds |
 | --- | --- |
 | **superpowers** | Core engineering workflow: brainstorming, TDD, systematic debugging, writing & executing plans, code review, git worktrees |
-| **vercel** | Deploying, Next.js, AI SDK, storage, env vars, CLI, and more |
-| **supabase** | Database, auth, edge functions, migrations, RLS |
-| **playwright** | Browser automation & testing |
+| **playwright** | Browser automation & testing (local — no login) |
 | **frontend-design** | Distinctive, production-grade UI generation |
-| **firecrawl** | Web search, scraping, crawling, structured extraction |
 | **claude-md-management** | Audit & improve `CLAUDE.md` files |
 | **claude-code-setup** | Recommend hooks, subagents, skills, MCP servers |
 | **andrej-karpathy-skills** | Guidelines to reduce common LLM coding mistakes |
 | **swift-lsp** / **rust-analyzer-lsp** | Language servers for Swift & Rust |
+
+**Opt-in — NOT enabled by default** (each needs your own personal credential, so
+the shared repo leaves them off to keep team onboarding zero-friction). Enable
+any you have a credential for with `claude plugin install <name>@claude-plugins-official`:
+
+| Plugin | What it adds | Needs |
+| --- | --- | --- |
+| **firecrawl** | Web search, scraping, crawling, structured extraction | API key |
+| **supabase** | Database, auth, edge functions, migrations, RLS | access token |
+| **vercel** | Deploying, Next.js, AI SDK, storage, env vars, CLI | account login |
 
 ### 3. Custom skills — ours, in this repo
 
@@ -159,7 +171,10 @@ Anything we add under [`skills/`](./skills/). Run `./list-skills.sh` to
 regenerate the list below from the `skills/` folder.
 
 <!-- SKILLS:START -->
-_No custom skills yet — copy `skills/_template/` to create one._
+| Skill | What it does |
+| --- | --- |
+| `/copyedit` | Editorial review of English prose/copy — grammar, clarity, concision, active voice, parallelism, consistency, tone, and AI-slop/cliché detection. Use when reviewing or polishing user-facing copy (landing pages, marketing, docs, UI strings, emails) or when the user asks "is this correct English", "review the copy/writing", "proofread", or "tighten this". |
+| `/markitdown` | Convert any local document or media file to clean Markdown using Microsoft's markitdown. Use when the user hands over a PDF, Word/PowerPoint/Excel file (docx/pptx/xlsx), image, audio file, HTML, CSV/JSON/XML, EPUB, or ZIP and wants its content read, extracted, summarized, or turned into markdown — i.e. "convert this", "read this PDF", "extract the text from", "what's in this file", "turn this doc into markdown". |
 <!-- SKILLS:END -->
 
 ---
@@ -173,13 +188,28 @@ git clone https://github.com/Akash9179/suryavanshi-claude.git ~/suryavanshi-clau
 cd ~/suryavanshi-claude && ./install.sh
 ```
 
-`install.sh` is idempotent (safe to re-run) and will:
+`install.sh` is idempotent and self-repairing (safe to re-run). It will:
 
-1. Add the plugin marketplaces and install our plugins
-2. Clone [gstack](https://github.com/garrytan/gstack) into `~/.claude/skills/`
-3. Deep-merge `settings.shared.json` into your `~/.claude/settings.json` (backing up the original first — your local settings are preserved)
-4. Import the shared practices into your global `~/.claude/CLAUDE.md`
-5. Link the custom skills and install the auto-pull hook
+1. **Bootstrap prerequisites** — check for `git`, `python3`, and the `claude` CLI, and install **bun** if it's missing (needed to build gstack's runtime)
+2. Add the plugin marketplaces and install the login-free plugins
+3. Clone [gstack](https://github.com/garrytan/gstack) into `~/.claude/skills/` **and run its `./setup`**, which *compiles* the `browse`/`design`/`pdf` binaries for this machine's architecture — without this the gstack skill files exist but nothing runs
+4. Deep-merge `settings.shared.json` into your `~/.claude/settings.json` (backing up the original first — your local settings are preserved)
+5. Import the shared practices into your global `~/.claude/CLAUDE.md`
+6. Link the custom skills and install the auto-pull hook
+7. **Verify** the end state and only report success when every critical piece is in place — otherwise it lists exactly what failed and exits non-zero
+
+### Is it actually working? Run the doctor
+
+```bash
+cd ~/suryavanshi-claude && ./doctor.sh
+```
+
+`doctor.sh` is the **single source of truth** for a healthy setup. It checks the
+*real runtime* — not just that files exist — so it catches the classic failure
+where gstack's files are present but its `browse` binary was never compiled. It
+prints `👍 GREEN — everything installed and running` and exits `0` only when every
+critical check passes; otherwise `👎 RED` and exits `1`. Use it as the goal you
+hand an agent: *"set this up and don't tell me it's done until `./doctor.sh` is green."*
 
 Then **restart Claude Code** so everything loads.
 
@@ -214,9 +244,14 @@ committed — they're excluded in [`.gitignore`](./.gitignore):
 - `settings.local.json` — per-machine permission allowlists
 - `.env`, API keys, secrets
 
-**A note on MCP servers:** plugins like Supabase, Firecrawl, Playwright, and
-Vercel sync via this repo, but their credentials do **not**. Each machine
-re-authenticates those on first use — by design, since they're secrets.
+**A note on MCP servers & personal logins:** the shared repo only enables
+**login-free** plugins by default. The ones that need a personal credential —
+**firecrawl** (API key), **supabase** (token), and **vercel** (login) — are
+intentionally left **off** so no teammate is forced to authenticate to get set
+up. Enable them yourself if you use them (see the opt-in table above); your
+credentials live only on your machine and are never committed. Personal
+claude.ai connectors (Gmail, Google Drive, Calendar) are tied to your account
+and are not part of this repo at all.
 
 ---
 
@@ -224,10 +259,13 @@ re-authenticates those on first use — by design, since they're secrets.
 
 | Symptom | Fix |
 | --- | --- |
+| Anything seems off / want a health check | Run `./doctor.sh` — it tells you exactly what's red and how to fix it |
+| gstack skills present but `/browse`, `/qa` etc. don't run | gstack's runtime wasn't compiled. Run `cd ~/.claude/skills/gstack && ./setup` (needs `bun`), or just re-run `./install.sh` |
+| `bun: command not found` during install | `install.sh` installs bun to `~/.bun`; open a new shell (or `export PATH="$HOME/.bun/bin:$PATH"`) and re-run |
 | A new skill didn't appear | Restart Claude Code, or run `./sync.sh` manually |
 | `sync: skipping '<name>'` warning | A non-symlink with that name already exists in `~/.claude/skills/` (often a gstack skill). Rename your skill to avoid the clash. |
 | Plugins missing after clone | Re-run `./install.sh`, then restart Claude Code |
-| An MCP server isn't working | Re-authenticate it / add its API key on this machine |
+| Want firecrawl/supabase/vercel | They're opt-in: `claude plugin install <name>@claude-plugins-official`, then add your credential |
 
 ---
 
