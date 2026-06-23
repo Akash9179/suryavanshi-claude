@@ -12,6 +12,32 @@ same setup, and a change made once shows up everywhere.
 
 ---
 
+## ⚡ Fastest way in: let Claude set it up
+
+Open Claude Code on the new machine and paste this prompt. Claude will pull the
+repo and run the full setup for you:
+
+```text
+Set up my Claude Code environment from the suryavanshi-claude shared repo.
+
+1. Clone https://github.com/Akash9179/suryavanshi-claude.git into ~/suryavanshi-claude
+   (if the folder already exists, cd into it and `git pull` instead).
+2. Run ./install.sh from that folder and show me the output. It is idempotent,
+   so it is safe even if some of it has run before.
+3. Confirm what it did: plugin marketplaces + plugins installed, gstack cloned,
+   settings.shared.json deep-merged into ~/.claude/settings.json, the shared
+   CLAUDE.md import added to ~/.claude/CLAUDE.md, custom skills linked, and the
+   auto-pull SessionStart hook installed.
+4. Tell me to restart Claude Code so the plugins, settings, and hook load.
+
+Do not commit or push anything, and do not touch my personal memory/, projects/,
+or settings.local.json. If install.sh reports an error, stop and show it to me.
+```
+
+Prefer to do it by hand? See [**Get set up**](#-get-set-up) below.
+
+---
+
 ## What is this?
 
 [Claude Code](https://claude.com/claude-code) keeps its configuration in a
