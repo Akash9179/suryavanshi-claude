@@ -69,9 +69,18 @@ if [ -f "$HOME/.claude/settings.json" ] && [ -f "$REPO/settings.shared.json" ]; 
 import json, sys
 shared = json.load(open(sys.argv[1])); live = json.load(open(sys.argv[2]))
 drift = []
-for key in ("permissions", "enabledPlugins", "extraKnownMarketplaces", "effortLevel", "hooks"):
+for key in ("permissions", "enabledPlugins", "extraKnownMarketplaces", "effortLevel"):
     if key in shared and shared[key] != live.get(key):
         drift.append(key)
+# Hooks: machines may ADD personal hooks (e.g. AgentPeek); only require that
+# every shared hook command is still present on its event.
+live_hooks = live.get("hooks", {})
+for event, groups in shared.get("hooks", {}).items():
+    live_cmds = {h.get("command") for g in live_hooks.get(event, []) for h in g.get("hooks", [])}
+    for g in groups:
+        for h in g.get("hooks", []):
+            if h.get("command") not in live_cmds:
+                drift.append(f"hooks.{event}")
 if drift:
     print(f"sync: DRIFT between settings.shared.json and ~/.claude/settings.json in: {', '.join(drift)} — reconcile and commit suryavanshi-claude.")
 PY
