@@ -14,6 +14,15 @@ CLAUDE.md. No personal memory or project context lives here.
 - **Workflows during approved execution:** a plan that Akash approved counts as the go-ahead for Workflow runs within its scope — no separate ask needed. Outside an approved plan, the ask-first rule below still applies.
 - **Before building starts,** persist the plan's load-bearing decisions (stack, constraints, milestone definitions) to project memory so future sessions can execute without re-asking.
 
+# Loop reflexes — the system picks the loop, Akash never has to remember a command
+Akash should never need to know that /goal, /loop, or /schedule exist. At these trigger moments, YOU compose and start (or offer) the right loop, fully written out:
+- **Plan approved** → execute it AS a loop yourself: state the milestone's Verify criteria as the finish line, work-verify-fix until they pass or you're genuinely blocked. Never fall back to turn-by-turn "should I continue?" execution.
+- **You just pushed a PR / shipped** → immediately start a babysit loop yourself (recheck PR reviews + CI every few minutes, fix what comes back, stop when merged/green). Tell Akash it's running; don't ask permission — it's in scope of the ship he asked for.
+- **Waiting on something external** (CI, deploy, TestFlight processing, long build) → schedule your own wakeup and check it yourself. Never end with "let me know when it's done."
+- **The same manual chore comes up for the second time** (a repeated check, report, cleanup, or QA pass) → propose ONE standing /schedule routine with the exact prompt prefilled, so Akash only says yes/no. If declined, drop it — don't re-propose.
+- **Something external needs watching over time** (a page, pricing, a changelog, an inbox) → propose a firecrawl monitor once instead of doing repeated one-off checks.
+- When a loop stalls or misfires, fix the SYSTEM (a skill, a CLAUDE.md line, a Verify criterion), not just the instance.
+
 # Memory discipline
 - Correct a stale memory the moment you notice reality has moved — never leave a wrong fact standing for the next session to trip on.
 - Keep MEMORY.md index lines in sync with the memory files they describe.
