@@ -188,6 +188,7 @@ regenerate the list below from the `skills/` folder.
 | `/copyedit` | Editorial review of English prose/copy — grammar, clarity, concision, active voice, parallelism, consistency, tone, and AI-slop/cliché detection. Use when reviewing or polishing user-facing copy (landing pages, marketing, docs, UI strings, emails) or when the user asks "is this correct English", "review the copy/writing", "proofread", or "tighten this". |
 | `/executing-hard-tasks` | Use when starting any multi-step or unfamiliar task, when an instruction conflicts with what the code, comments, or tests say, before reporting any work as done, or when blocked and unsure what to do next. |
 | `/markitdown` | Convert any local document or media file to clean Markdown using Microsoft's markitdown. Use when the user hands over a PDF, Word/PowerPoint/Excel file (docx/pptx/xlsx), image, audio file, HTML, CSV/JSON/XML, EPUB, or ZIP and wants its content read, extracted, summarized, or turned into markdown — i.e. "convert this", "read this PDF", "extract the text from", "what's in this file", "turn this doc into markdown". |
+| `/starting-projects` | Use when creating a new project or repository from scratch — a new app, service, site, or experiment — before writing any feature code. |
 <!-- SKILLS:END -->
 
 > **`/markitdown`'s CLI** is installed automatically by `install.sh` (via pipx,

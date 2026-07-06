@@ -7,6 +7,18 @@ CLAUDE.md. No personal memory or project context lives here.
 - **Bias to autonomy.** Akash does not want to be consulted on every decision. On anything reversible, pick a sensible default, state it, and proceed. Ask only for irreversible/destructive actions, spend, or genuine scope changes.
 - **Honest cost/benefit.** When he floats an idea, give a straight build-or-not verdict with reasons — no cheerleading. If something isn't worth building, say so plainly.
 
+# Plan together, then execute hands-off
+- **Planning is collaborative.** Brainstorming, specs (`/spec`), and plan reviews happen WITH Akash — this is the stage he wants to be involved in. Surface assumptions, options, and cost/benefit here, and capture per-milestone done-criteria in the plan.
+- **Execution is autonomous.** Once a plan is approved, work it end-to-end: build, verify each milestone against its done-criteria (tests; `/qa` or `/browse` for anything user-facing), fix what verification finds, and return with evidence — not questions. "Should I continue?" is never worth an interruption.
+- During execution, come back to Akash only for: scope changes, irreversible or spending actions, or an instruction-vs-evidence conflict (see the executing-hard-tasks skill).
+- **Workflows during approved execution:** a plan that Akash approved counts as the go-ahead for Workflow runs within its scope — no separate ask needed. Outside an approved plan, the ask-first rule below still applies.
+- **Before building starts,** persist the plan's load-bearing decisions (stack, constraints, milestone definitions) to project memory so future sessions can execute without re-asking.
+
+# Memory discipline
+- Correct a stale memory the moment you notice reality has moved — never leave a wrong fact standing for the next session to trip on.
+- Keep MEMORY.md index lines in sync with the memory files they describe.
+- (For Akash) launch Claude from the project's real directory under `~/Projects/` so the right auto-memory loads.
+
 # Web access — one hierarchy
 - **Interactive browsing, QA, dogfooding a running site:** `/browse` (gstack). NEVER use `mcp__claude-in-chrome__*` tools.
 - **Scraping, crawling, web search, structured extraction:** firecrawl skills.
@@ -15,7 +27,7 @@ CLAUDE.md. No personal memory or project context lives here.
 
 # Dynamic workflows
 - Proactively **recommend** dynamic multi-agent Workflows (the `Workflow` tool) wherever a task genuinely fits — wide/multi-file work, tasks needing independent verification, or unknown-size discovery. Surface a one-line shape with the offer.
-- **The user always makes the decision to run one.** Never launch a Workflow without explicit go-ahead. Say so plainly when a workflow would be overkill (single-file/one-off/trivial).
+- **The user decides to run one** — either directly, or by approving a plan whose execution needs it (see "Plan together, then execute hands-off"). With neither, never launch a Workflow. Say so plainly when a workflow would be overkill (single-file/one-off/trivial).
 
 # gstack
 - **gstack** (`~/.claude/skills/gstack/`) - planning, review, ship/deploy, browser QA, and team workflow skills. The harness lists every available skill each session — there is no hand-maintained list here to drift.
