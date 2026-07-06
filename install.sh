@@ -69,6 +69,27 @@ else
   rm -f "$tmpfile"
 fi
 
+# markitdown CLI powers the /markitdown custom skill. Installed via pipx
+# (bootstrapped through brew if needed). Non-critical here, but doctor.sh
+# treats it as critical while the skill ships in this repo.
+if have markitdown; then
+  ok "markitdown found ($(command -v markitdown))"
+else
+  softwarn "markitdown CLI not found — installing via pipx (powers /markitdown)"
+  if ! have pipx && have brew; then
+    brew install pipx >/dev/null 2>&1 && ok "pipx installed (brew)" || warn "brew install pipx failed"
+  fi
+  if have pipx; then
+    if pipx install 'markitdown[all]' >/dev/null 2>&1 && have markitdown; then
+      ok "markitdown installed ($(command -v markitdown))"
+    else
+      softwarn "markitdown install incomplete — /markitdown won't run. Manual fix: pipx install 'markitdown[all]' && pipx ensurepath"
+    fi
+  else
+    softwarn "pipx unavailable — /markitdown needs its CLI. Manual fix: brew install pipx && pipx install 'markitdown[all]'"
+  fi
+fi
+
 # ── 2/7 Plugin marketplaces ───────────────────────────────────
 step "2/7 Plugin marketplaces"
 if have claude; then

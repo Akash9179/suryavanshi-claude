@@ -25,7 +25,7 @@ Set up my Claude Code environment from the suryavanshi-claude shared repo.
    matters: the shared sync hook hardcodes ~/suryavanshi-claude.
 2. Run ./install.sh from that folder and show me the output. It is idempotent and
    self-repairing, so it is safe even if some of it has run before. It will
-   bootstrap prerequisites (it installs bun if missing), install the login-free
+   bootstrap prerequisites (installing bun and the markitdown CLI if missing), install the login-free
    plugins, clone AND BUILD gstack (compiling its browse runtime for this
    machine), deep-merge settings.shared.json into ~/.claude/settings.json, add the
    shared CLAUDE.md import, link custom skills, and install the auto-pull hook.
@@ -190,8 +190,8 @@ regenerate the list below from the `skills/` folder.
 | `/markitdown` | Convert any local document or media file to clean Markdown using Microsoft's markitdown. Use when the user hands over a PDF, Word/PowerPoint/Excel file (docx/pptx/xlsx), image, audio file, HTML, CSV/JSON/XML, EPUB, or ZIP and wants its content read, extracted, summarized, or turned into markdown — i.e. "convert this", "read this PDF", "extract the text from", "what's in this file", "turn this doc into markdown". |
 <!-- SKILLS:END -->
 
-> **One-time prerequisite for `/markitdown`:** its CLI isn't bundled — install it
-> once per machine with `pipx install 'markitdown[all]'` (lands in `~/.local/bin`).
+> **`/markitdown`'s CLI** is installed automatically by `install.sh` (via pipx,
+> to `~/.local/bin`) and checked by `doctor.sh`. Manual fallback: `pipx install 'markitdown[all]'`.
 
 ---
 
@@ -210,7 +210,7 @@ cd ~/suryavanshi-claude && ./install.sh
 
 `install.sh` is idempotent and self-repairing (safe to re-run). It will:
 
-1. **Bootstrap prerequisites** — check for `git`, `python3`, and the `claude` CLI, and install **bun** if it's missing (needed to build gstack's runtime)
+1. **Bootstrap prerequisites** — check for `git`, `python3`, and the `claude` CLI, and install **bun** (needed to build gstack's runtime) and the **markitdown CLI** (powers `/markitdown`, via pipx) if they're missing
 2. Add the plugin marketplaces and install the login-free plugins
 3. Clone [gstack](https://github.com/garrytan/gstack) into `~/.claude/skills/` **and run its `./setup`**, which *compiles* the `browse`/`design`/`pdf` binaries for this machine's architecture — without this the gstack skill files exist but nothing runs
 4. Deep-merge `settings.shared.json` into your `~/.claude/settings.json` (a timestamped `.bak` is saved first). Lists are unioned, so personal hooks and extra deny rules survive re-runs; the shared team defaults (`defaultMode: auto`, `effortLevel: high`) overwrite those specific keys, and everything else local is untouched
@@ -286,7 +286,7 @@ and are not part of this repo at all.
 | `bun: command not found` during install | `install.sh` installs bun to `~/.bun`; open a new shell (or `export PATH="$HOME/.bun/bin:$PATH"`) and re-run |
 | A new skill didn't appear | Restart Claude Code, or run `./sync.sh` manually |
 | `sync: skipping '<name>'` warning | A non-symlink with that name already exists in `~/.claude/skills/` (often a gstack skill). Rename your skill to avoid the clash |
-| `/markitdown` fails | Its CLI is a one-time install: `pipx install 'markitdown[all]'` |
+| `/markitdown` fails | Re-run `./install.sh` (installs its CLI via pipx), or: `pipx install 'markitdown[all]'` |
 | Plugins missing after clone | Re-run `./install.sh`, then restart Claude Code |
 | Want firecrawl/supabase/vercel | They're opt-in: `claude plugin install <name>@claude-plugins-official`, then add your credential |
 

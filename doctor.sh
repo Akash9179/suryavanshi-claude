@@ -85,6 +85,12 @@ for d in "$REPO"/skills/*/; do
 done
 [ "$linked" -eq 0 ] && [ "$missing" -eq 0 ] && note "no custom skills in repo yet"
 
+# Skill runtime dependencies (checked only while the skill ships in this repo)
+if [ -d "$REPO/skills/markitdown" ]; then
+  if have markitdown; then pass "markitdown CLI present (powers /markitdown)"
+  else crit "markitdown CLI missing — /markitdown will fail. Fix: re-run ./install.sh, or: pipx install 'markitdown[all]'"; fi
+fi
+
 # ── Verdict ───────────────────────────────────────────────────
 echo
 if [ "$CRIT_FAIL" -eq 0 ]; then
