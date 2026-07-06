@@ -2,10 +2,12 @@
   "permissions": {
     "deny": [
       "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
       "Bash(git push --force*)",
       "Bash(git reset --hard*)",
       "Bash(DROP *)",
-      "Bash(truncate *)"
+      "Bash(truncate *)",
+      "mcp__claude-in-chrome__*"
     ],
     "defaultMode": "auto"
   },
@@ -13,11 +15,14 @@
     "superpowers@claude-plugins-official": true,
     "andrej-karpathy-skills@karpathy-skills": true,
     "swift-lsp@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true,
+    "playwright@claude-plugins-official": false,
     "frontend-design@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "firecrawl@claude-plugins-official": true,
+    "supabase@claude-plugins-official": true,
+    "vercel@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "superpowers-marketplace": {

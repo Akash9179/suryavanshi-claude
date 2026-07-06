@@ -59,3 +59,20 @@ if [ -f "$REPO/.autopull" ] && [ -x "$GSTACK_DIR/setup" ] && command -v bun >/de
       || echo "sync: gstack rebuild FAILED — run 'cd $GSTACK_DIR && ./setup' to see why." >&2
   fi
 fi
+
+# 4. Drift check: warn when the shared portions of live settings diverge from
+#    settings.shared.json (deny rules, plugins, marketplaces, effort). The live
+#    file may hold EXTRA machine-personal keys (model, tui, notifications) —
+#    only the shared keys are compared. Warning only; nothing is auto-changed.
+if [ -f "$HOME/.claude/settings.json" ] && [ -f "$REPO/settings.shared.json" ]; then
+  python3 - "$REPO/settings.shared.json" "$HOME/.claude/settings.json" <<'PY' >&2 || true
+import json, sys
+shared = json.load(open(sys.argv[1])); live = json.load(open(sys.argv[2]))
+drift = []
+for key in ("permissions", "enabledPlugins", "extraKnownMarketplaces", "effortLevel", "hooks"):
+    if key in shared and shared[key] != live.get(key):
+        drift.append(key)
+if drift:
+    print(f"sync: DRIFT between settings.shared.json and ~/.claude/settings.json in: {', '.join(drift)} — reconcile and commit suryavanshi-claude.")
+PY
+fi
