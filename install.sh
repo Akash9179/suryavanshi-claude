@@ -86,9 +86,10 @@ step "3/7 Plugins"
 # (firecrawl=API key, supabase=token, vercel=login) are intentionally NOT here —
 # they prompt each teammate for personal auth. Enable them yourself if you have
 # the credentials: `claude plugin install <name>@claude-plugins-official`.
+# playwright is intentionally absent too: /browse (gstack) is our browser stack,
+# and settings.shared.json pins playwright off to avoid a third browsing system.
 PLUGINS=(
   superpowers@claude-plugins-official
-  playwright@claude-plugins-official
   frontend-design@claude-plugins-official
   swift-lsp@claude-plugins-official
   rust-analyzer-lsp@claude-plugins-official
@@ -153,6 +154,10 @@ def load(p):
 def merge(a, b):
     for k, v in b.items():
         if isinstance(v, dict) and isinstance(a.get(k), dict): merge(a[k], v)
+        elif isinstance(v, list) and isinstance(a.get(k), list):
+            # Union: keep local entries (personal hooks, extra deny rules),
+            # append shared entries that aren't already present.
+            a[k] = a[k] + [x for x in v if x not in a[k]]
         else: a[k] = v
     return a
 base = merge(load(target), load(shared))

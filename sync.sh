@@ -69,9 +69,16 @@ if [ -f "$HOME/.claude/settings.json" ] && [ -f "$REPO/settings.shared.json" ]; 
 import json, sys
 shared = json.load(open(sys.argv[1])); live = json.load(open(sys.argv[2]))
 drift = []
-for key in ("permissions", "enabledPlugins", "extraKnownMarketplaces", "effortLevel"):
+for key in ("permissions", "extraKnownMarketplaces", "effortLevel"):
     if key in shared and shared[key] != live.get(key):
         drift.append(key)
+# Plugins: shared is the login-free BASELINE; machines may enable extra
+# credential-gated plugins (firecrawl/supabase/vercel) personally. Only the
+# plugins named in shared must match (incl. explicit `false` entries).
+live_plugins = live.get("enabledPlugins", {})
+for name, want in shared.get("enabledPlugins", {}).items():
+    if live_plugins.get(name, False) != want:
+        drift.append(f"enabledPlugins.{name}")
 # Hooks: machines may ADD personal hooks (e.g. AgentPeek); only require that
 # every shared hook command is still present on its event.
 live_hooks = live.get("hooks", {})
