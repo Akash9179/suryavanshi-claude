@@ -38,10 +38,5 @@ Akash should never need to know that /goal, /loop, or /schedule exist. At these 
 # gstack
 - **gstack** (`~/.claude/skills/gstack/`) - planning, review, ship/deploy, browser QA, and team workflow skills.
 
-# Design references (applies to ALL projects)
-- For ANY UI/design work — exploring design ideas, brainstorming a look, building or restyling an interface — consult the curated **awesome-design-md** collection first: https://github.com/voltagent/awesome-design-md (real, analyzed DESIGN.md files for Apple, Airbnb, Linear, Stripe, Vercel, Notion, Figma, Spotify, Nike, and ~80 more). Pull the relevant brand's spec raw and ground tokens/type/spacing/aesthetic in it before proposing or building: `https://raw.githubusercontent.com/voltagent/awesome-design-md/main/design-md/<name>/DESIGN.md` (list folder names via the GitHub contents API for `design-md/`).
-- When I say I want **high quality** or ask for a **design review**, treat that as a hard bar: pick the closest reference(s) from that repo, extract their concrete tokens, and match that level — do not ship generic/AI-default UI.
-- **Default taste target:** modern, luxurious, simple — Apple/Airbnb-grade. Light canvas, generous whitespace, ONE restrained accent, clean geometric sans, photography-first. Avoid dark-editorial-by-default unless I ask for it.
-
 # Custom skills
 - Custom skills live in this repo under `skills/` and are symlinked into `~/.claude/skills/`. Run `~/suryavanshi-claude/sync.sh` after adding one.
