@@ -12,7 +12,7 @@
     "defaultMode": "auto"
   },
   "enabledPlugins": {
-    "superpowers@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": false,
     "andrej-karpathy-skills@karpathy-skills": true,
     "swift-lsp@claude-plugins-official": true,
     "playwright@claude-plugins-official": false,
@@ -22,9 +22,6 @@
     "rust-analyzer-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
-    "superpowers-marketplace": {
-      "source": { "source": "github", "repo": "obra/superpowers-marketplace" }
-    },
     "claude-plugins-official": {
       "source": { "source": "github", "repo": "anthropics/claude-plugins-official" }
     },
