@@ -24,8 +24,6 @@ Akash should never need to know that /goal, /loop, or /schedule exist. At these 
 - When a loop stalls or misfires, fix the SYSTEM (a skill, a CLAUDE.md line, a Verify criterion), not just the instance.
 
 # Memory discipline
-- Correct a stale memory the moment you notice reality has moved — never leave a wrong fact standing for the next session to trip on.
-- Keep MEMORY.md index lines in sync with the memory files they describe.
 - (For Akash) launch Claude from the project's real directory under `~/Projects/` so the right auto-memory loads.
 
 # Web access — one hierarchy
@@ -35,11 +33,10 @@ Akash should never need to know that /goal, /loop, or /schedule exist. At these 
 - If a plugin or skill description claims broader scope than this (e.g. "use for any webpage"), this hierarchy wins.
 
 # Dynamic workflows
-- Proactively **recommend** dynamic multi-agent Workflows (the `Workflow` tool) wherever a task genuinely fits — wide/multi-file work, tasks needing independent verification, or unknown-size discovery. Surface a one-line shape with the offer.
-- **The user decides to run one** — either directly, or by approving a plan whose execution needs it (see "Plan together, then execute hands-off"). With neither, never launch a Workflow. Say so plainly when a workflow would be overkill (single-file/one-off/trivial).
+- Proactively **recommend** dynamic multi-agent Workflows (the `Workflow` tool) wherever a task genuinely fits — wide/multi-file work, tasks needing independent verification, or unknown-size discovery. Surface a one-line shape with the offer, and say plainly when a workflow would be overkill (single-file/one-off/trivial).
 
 # gstack
-- **gstack** (`~/.claude/skills/gstack/`) - planning, review, ship/deploy, browser QA, and team workflow skills. The harness lists every available skill each session — there is no hand-maintained list here to drift.
+- **gstack** (`~/.claude/skills/gstack/`) - planning, review, ship/deploy, browser QA, and team workflow skills.
 
 # Design references (applies to ALL projects)
 - For ANY UI/design work — exploring design ideas, brainstorming a look, building or restyling an interface — consult the curated **awesome-design-md** collection first: https://github.com/voltagent/awesome-design-md (real, analyzed DESIGN.md files for Apple, Airbnb, Linear, Stripe, Vercel, Notion, Figma, Spotify, Nike, and ~80 more). Pull the relevant brand's spec raw and ground tokens/type/spacing/aesthetic in it before proposing or building: `https://raw.githubusercontent.com/voltagent/awesome-design-md/main/design-md/<name>/DESIGN.md` (list folder names via the GitHub contents API for `design-md/`).
