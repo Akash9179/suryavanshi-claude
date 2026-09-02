@@ -185,11 +185,19 @@ regenerate the list below from the `skills/` folder.
 <!-- SKILLS:START -->
 | Skill | What it does |
 | --- | --- |
+| `/animation-vocabulary` | Reverse-lookup glossary that turns a vague description of a web animation or motion effect into its exact term ("the bouncy thing when a popover opens" → Pop in; "the iOS rubber-band scroll" → Rubber-banding). Use when the user asks "what's it called when…", or describes a motion effect without knowing its name and wants the right word to prompt an AI or designer with. For naming an effect, not designing or building one. |
+| `/apple-design` | Apple's approach to interface design and fluid, physical motion, translated for the web. Use when building or reviewing gesture-driven UI, spring animations, drag/swipe/sheet interactions, momentum and interruptible transitions, translucent materials and depth, typography (optical sizing, tracking, leading), reduced-motion, or the design foundations (feedback, spatial consistency, restraint) behind Apple-style interfaces. |
 | `/copyedit` | Editorial review of English prose/copy — grammar, clarity, concision, active voice, parallelism, consistency, tone, and AI-slop/cliché detection. Use when reviewing or polishing user-facing copy (landing pages, marketing, docs, UI strings, emails) or when the user asks "is this correct English", "review the copy/writing", "proofread", or "tighten this". |
+| `/design-references` | Use when doing any UI or design work — exploring design ideas, brainstorming a look, building or restyling an interface — or when Akash asks for "high quality" or a design review. |
+| `/emil-design-eng` | This skill encodes Emil Kowalski's philosophy on UI polish, component design, animation decisions, and the invisible details that make software feel great. |
 | `/executing-hard-tasks` | Use when starting any multi-step or unfamiliar task, when an instruction conflicts with what the code, comments, or tests say, before reporting any work as done, or when blocked and unsure what to do next. |
+| `/improve-animations` | Survey a codebase's animation and motion code as a senior motion advisor, then produce a prioritized audit and self-contained implementation plans for other agents (or cheaper models) to execute. Read-only on source code — it plans improvements, it does not apply them. Use when the user asks to "improve the animations", "audit the motion", "make this app feel better", or wants a roadmap of animation fixes rather than a review of a single diff. |
 | `/markitdown` | Convert any local document or media file to clean Markdown using Microsoft's markitdown. Use when the user hands over a PDF, Word/PowerPoint/Excel file (docx/pptx/xlsx), image, audio file, HTML, CSV/JSON/XML, EPUB, or ZIP and wants its content read, extracted, summarized, or turned into markdown — i.e. "convert this", "read this PDF", "extract the text from", "what's in this file", "turn this doc into markdown". |
 | `/memory-hygiene` | Use when auditing, cleaning, or reorganizing Claude Code auto-memory directories, when memories contradict reality or each other, when a project has moved or been renamed, or when MEMORY.md index lines don't match the files on disk. |
+| `/review-animations` | Reviews animation and motion code against a high craft bar derived from Emil Kowalski's design engineering philosophy. Default to flagging; approval is earned. |
 | `/starting-projects` | Use when creating a new project or repository from scratch — a new app, service, site, or experiment — before writing any feature code. |
+| `/test-driven-development` | Use when implementing any feature or bugfix, before writing implementation code |
+| `/writing-skills` | Use when creating new skills, editing existing skills, or verifying skills work before deployment |
 <!-- SKILLS:END -->
 
 > **`/markitdown`'s CLI** is installed automatically by `install.sh` (via pipx,
