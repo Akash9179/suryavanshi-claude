@@ -22,19 +22,21 @@
     "rust-analyzer-lsp@claude-plugins-official": false
   },
   "skillOverrides": {
-    "animation-vocabulary": "off",
-    "apple-design": "off",
-    "emil-design-eng": "off",
-    "improve-animations": "off",
     "learn": "off",
     "connect-chrome": "off"
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
-      "source": { "source": "github", "repo": "anthropics/claude-plugins-official" }
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
     },
     "karpathy-skills": {
-      "source": { "source": "github", "repo": "forrestchang/andrej-karpathy-skills" }
+      "source": {
+        "source": "github",
+        "repo": "forrestchang/andrej-karpathy-skills"
+      }
     }
   },
   "effortLevel": "high",

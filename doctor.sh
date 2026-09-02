@@ -38,7 +38,7 @@ done
 printf '\n%sgstack runtime%s\n' "$BOLD" "$RST"
 if [ -d "$GSTACK_DIR/.git" ]; then pass "gstack cloned"; else crit "gstack not cloned at $GSTACK_DIR"; fi
 if [ -x "$GSTACK_DIR/browse/dist/browse" ]; then
-  pass "browse binary built ($("$GSTACK_DIR/browse/dist/browse" --version 2>/dev/null | head -1 || echo present))"
+  v="$("$GSTACK_DIR/browse/dist/browse" --version 2>/dev/null | head -1)"; pass "browse binary built (${v:-present})"
 else
   crit "browse binary missing/not built — /browse, /qa, /design-review will not run"
 fi

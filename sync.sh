@@ -75,6 +75,10 @@ for key in ("permissions", "extraKnownMarketplaces", "effortLevel"):
 # Plugins: shared is the login-free BASELINE; machines may enable extra
 # credential-gated plugins (firecrawl/supabase/vercel) personally. Only the
 # plugins named in shared must match (incl. explicit `false` entries).
+live_so = live.get("skillOverrides", {})
+for name, want in shared.get("skillOverrides", {}).items():
+    if live_so.get(name) != want:
+        drift.append(f"skillOverrides.{name}")
 live_plugins = live.get("enabledPlugins", {})
 for name, want in shared.get("enabledPlugins", {}).items():
     if live_plugins.get(name, False) != want:
