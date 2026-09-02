@@ -35,8 +35,5 @@ Akash should never need to know that /goal, /loop, or /schedule exist. At these 
 # Dynamic workflows
 - Proactively **recommend** dynamic multi-agent Workflows (the `Workflow` tool) wherever a task genuinely fits — wide/multi-file work, tasks needing independent verification, or unknown-size discovery. Surface a one-line shape with the offer, and say plainly when a workflow would be overkill (single-file/one-off/trivial).
 
-# gstack
-- **gstack** (`~/.claude/skills/gstack/`) - planning, review, ship/deploy, browser QA, and team workflow skills.
-
 # Custom skills
 - Custom skills live in this repo under `skills/` and are symlinked into `~/.claude/skills/`. Run `~/suryavanshi-claude/sync.sh` after adding one.
