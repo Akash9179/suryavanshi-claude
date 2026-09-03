@@ -7,15 +7,15 @@ description: Use when doing any UI or design work — exploring design ideas, br
 
 ## Reference library
 
-Consult the curated **awesome-design-md** collection first: https://github.com/voltagent/awesome-design-md — real, analyzed DESIGN.md files for Apple, Airbnb, Linear, Stripe, Vercel, Notion, Figma, Spotify, Nike, and ~80 more.
+Ground tokens/type/spacing/aesthetic in a real DESIGN.md before proposing or building. Sources, in order:
 
-Pull the relevant brand's spec raw and ground tokens/type/spacing/aesthetic in it before proposing or building:
-
-```
-https://raw.githubusercontent.com/voltagent/awesome-design-md/main/design-md/<name>/DESIGN.md
-```
-
-(List folder names via the GitHub contents API for `design-md/`.)
+1. **Refero Styles** — https://styles.refero.design — 2,000+ DESIGN.md files from real product sites, filterable by aesthetic (Minimal, Clean SaaS, Editorial Type, Soft Gradients, Monochrome, Premium). Search by brand name or aesthetic, open the style page, and scrape it (firecrawl) for the full spec. Start here.
+2. **awesome-design-md** — https://github.com/voltagent/awesome-design-md — ~80 hand-analyzed specs (Apple, Airbnb, Linear, Stripe, Vercel, Notion, Figma, Spotify, Nike…). Raw fetch:
+   ```
+   https://raw.githubusercontent.com/voltagent/awesome-design-md/main/design-md/<name>/DESIGN.md
+   ```
+   (List folder names via the GitHub contents API for `design-md/`.)
+3. **URL → DESIGN.md extractor** — https://www.sokosumi.com/tools/design-md — free, no key. Use when the reference site isn't in either catalog, or when Akash says "make it look like <url>". designmd.me is the credit-gated alternative with Figma import.
 
 ## Quality bar
 
