@@ -27,6 +27,19 @@ CLAUDE.md. No personal memory or project context lives here.
 - **Definition of done.** Meaningful work is complete only after relevant behavior, tests, types, lint, builds, security boundaries, and migrations have been verified; Codex findings have been resolved when review was warranted; documentation is current; and no unrelated changes were introduced.
 - **Human approval remains required** for destructive or irreversible production actions, production database changes, production deployments, secret changes, infrastructure deletion, spending, and genuine scope changes. The agents may prepare and verify these operations but must not execute them without approval.
 
+# Delivery speed — size the work first (Akash 2026-09-13: "it was insane… more than 2 hours for one feature")
+- **Pick a track before building, and say it in one line:** Fix (1–3 files; build directly; 15–30 min) ·
+  Feature (one capability; build in-session, at most one helper agent; 60–90 min) · Batch (many independent
+  items; the multi-agent pipeline, ≤ 90 min). A single feature NEVER goes through a multi-agent pipeline.
+- **Slice** risky backend from low-risk UI when each can ship alone.
+- **One review round.** Codex reviews the whole final diff once, in parallel with rendered screenshots; one fix
+  round; a second Codex look only for fixes touching auth/RLS/migrations/money. Leftovers go to the release
+  gate, never another round. Code quality stays non-negotiable: tests, types, lint and the Codex review all run.
+- **Check Codex quota at the start** of the review step; if it is exhausted, tell Akash immediately.
+- **Time box.** At 1.5× the track budget, stop and tell Akash why, with options. Watch any running workflow
+  every ~10 min and stop it on a second build round or a runaway fix loop.
+- **Missing production data is a release-time check,** never a reason to rebuild.
+
 # Loop reflexes — the system picks the loop, Akash never has to remember a command
 Akash should never need to know that /goal, /loop, or /schedule exist. At these trigger moments, YOU compose and start (or offer) the right loop, fully written out:
 - **Plan approved** → execute it AS a loop yourself: state the milestone's Verify criteria as the finish line, work-verify-fix until they pass or you're genuinely blocked. Never fall back to turn-by-turn "should I continue?" execution. Also hand Akash the ready-to-paste native line for harness-level enforcement — e.g. `/goal <the milestone's Verify criteria>, stop after 5 tries` — he should never have to compose it himself.
