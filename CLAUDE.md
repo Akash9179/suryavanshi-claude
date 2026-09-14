@@ -58,6 +58,10 @@ Akash should never need to know that /goal, /loop, or /schedule exist. At these 
 - **Single quick fetch of a known URL:** built-in WebFetch is fine.
 - If a plugin or skill description claims broader scope than this (e.g. "use for any webpage"), this hierarchy wins.
 
+# One tool per job (pruned 2026-09-13 from 430 sessions of usage data)
+- Spec → `/spec` · ideas → `/office-hours` · diff review → `/code-review` + Codex MCP · security → `/security-review` · web QA → `/qa` · visual QA → `/design-review` · browsing → `/browse` · scraping/search → firecrawl.
+- Unused gstack skills are `"off"` in `skillOverrides` (settings.shared.json). Re-enable one only when a real task needs it; don't add a second tool for a job that already has one.
+
 # Dynamic workflows
 - Proactively **recommend** dynamic multi-agent Workflows (the `Workflow` tool) wherever a task genuinely fits — wide/multi-file work, tasks needing independent verification, or unknown-size discovery. Surface a one-line shape with the offer, and say plainly when a workflow would be overkill (single-file/one-off/trivial).
 

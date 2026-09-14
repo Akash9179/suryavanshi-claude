@@ -69,9 +69,22 @@ if [ -f "$HOME/.claude/settings.json" ] && [ -f "$REPO/settings.shared.json" ]; 
 import json, sys
 shared = json.load(open(sys.argv[1])); live = json.load(open(sys.argv[2]))
 drift = []
-for key in ("permissions", "extraKnownMarketplaces", "effortLevel"):
+for key in ("extraKnownMarketplaces", "effortLevel"):
     if key in shared and shared[key] != live.get(key):
         drift.append(key)
+# Permissions: deny rules and mode must match exactly. Machines may ADD
+# personal allows (e.g. deploy/merge on the owner's Mac, never on shared boxes);
+# only require that every shared allow is still present.
+sp, lp = shared.get("permissions", {}), live.get("permissions", {})
+for key, want in sp.items():
+    if key == "allow":
+        if not set(want) <= set(lp.get("allow", [])):
+            drift.append("permissions.allow")
+    elif lp.get(key) != want:
+        drift.append(f"permissions.{key}")
+for key in lp:
+    if key not in sp and key != "allow":
+        drift.append(f"permissions.{key}")
 # Plugins: shared is the login-free BASELINE; machines may enable extra
 # credential-gated plugins (firecrawl/supabase/vercel) personally. Only the
 # plugins named in shared must match (incl. explicit `false` entries).
