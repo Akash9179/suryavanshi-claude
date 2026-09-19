@@ -17,6 +17,14 @@ CLAUDE.md. No personal memory or project context lives here.
 # Claude + Codex engineering collaboration
 - **Roles.** Claude Code is the tech lead, context owner, and primary implementer. Codex, available through MCP, is an independent principal engineer, debugger, and adversarial reviewer.
 - **Model preference.** Use Fable 5.1 for normal Claude work and escalate to Opus 5 when deeper reasoning is justified. For Codex, use the strongest appropriate current OpenAI model; prefer Astra when available unless another model is better suited. Do not increase model cost or latency without a material expected benefit.
+- **Model routing (added 2026-09-19, cheapest model that still gets the best result).** Every Agent call and Codex call passes an explicit model, chosen from this table; say the model and the one-line reason before the call. The main session stays on Fable 5.1 — it cannot be switched by code.
+  - Haiku 4.5: file search, greps, summarising tool output, mechanical multi-file edits with a known recipe.
+  - Sonnet 5: single-file features, writing tests, docs, most subagent implementation work.
+  - Fable 5.1: planning, cross-file changes, debugging with unclear cause, anything that changes an interface.
+  - Opus 5: only after Fable has failed twice on the same problem, or for genuinely architectural decisions. Never as a first pick.
+  - Codex Astra: the one final-diff review and the high-risk list above; independent diagnosis when a patch loop is stopped. Codex cheaper model: mechanical checks (lint-like passes, spec conformance) where reasoning depth is not the bottleneck.
+  - Downgrade rule: if a subagent on a cheaper model returns a clean, verified result, stay there for similar work in that session. Upgrade only on a concrete failure, not on a feeling.
+  - At the end of any session that spawned agents or called Codex, report `/cost` and one line on where tokens went, so Akash can see the split without asking.
 - **Investigate independently first.** Before consulting Codex, understand the requirement, inspect the relevant repository evidence, identify the likely implementation boundary, and form an independent technical opinion. Ask Codex to investigate or falsify assumptions, not merely to validate Claude's conclusion.
 - **Use Codex selectively.** Consult Codex when independent reasoning materially improves correctness, security, architecture, debugging, or reliability. Do not invoke it for trivial text, styling, formatting, renaming, documentation, or obvious one-line changes.
 - **High-risk review.** Independent Codex analysis and final-diff review are normally required for authentication, authorization, permissions, RLS, tenant isolation, payments, database migrations, destructive data operations, infrastructure, deployment configuration, secrets, cryptography, concurrency, major refactors, and production data-integrity logic.
