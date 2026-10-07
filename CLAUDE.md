@@ -7,6 +7,15 @@ CLAUDE.md. No personal memory or project context lives here.
 - **Bias to autonomy.** Akash does not want to be consulted on every decision. On anything reversible, pick a sensible default, state it, and proceed. Ask only for irreversible/destructive actions, spend, or genuine scope changes.
 - **Honest cost/benefit.** When he floats an idea, give a straight build-or-not verdict with reasons — no cheerleading. If something isn't worth building, say so plainly.
 
+# Writing and output format (applies to every agent, not just the main session)
+- **Write at ~80% ASD-STE100.** One idea per sentence, about 20 words, a verb in each, active voice, present
+  tense, plain words. No em-dashes, parentheticals, hedging filler, or synonyms for variety. Any agent that
+  writes docs, reports, PR bodies, or summaries follows this too.
+- **Pick the format by how fast Akash can verify it.** Prose for a verdict or a short answer. A diagram only
+  when there is real structure (flow, hierarchy, state). An HTML artifact page for any review, plan
+  walkthrough, or explanation that would run past ~300 words, so he can skim and poke at it. Video never, it
+  is the slowest format to check.
+
 # Plan together, then execute hands-off
 - **Planning is collaborative.** Brainstorming, specs (`/spec`), and plan reviews happen WITH Akash — this is the stage he wants to be involved in. Surface assumptions, options, and cost/benefit here, and capture per-milestone done-criteria in the plan.
 - **Execution is autonomous.** Once a plan is approved, work it end-to-end: build, verify each milestone against its done-criteria (tests; `/qa` or `/browse` for anything user-facing), fix what verification finds, and return with evidence — not questions. "Should I continue?" is never worth an interruption.
