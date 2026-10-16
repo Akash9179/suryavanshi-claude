@@ -24,11 +24,11 @@ CLAUDE.md. No personal memory or project context lives here.
 - **Before building starts,** persist the plan's load-bearing decisions (stack, constraints, milestone definitions) to project memory so future sessions can execute without re-asking.
 
 # Claude + Codex engineering collaboration
-- **Roles.** Claude Code is the tech lead, context owner, and primary implementer. Codex, available through MCP, is an independent principal engineer, debugger, and adversarial reviewer.
+- **Roles.** Claude Code is the tech lead, context owner, and primary implementer. Codex, available through OpenAI's official Claude Code plugin (`/codex:review`, `/codex:adversarial-review`, the `codex:codex-rescue` agent; the old `codex mcp-server` MCP route is gone since Codex CLI 0.162), is an independent principal engineer, debugger, and adversarial reviewer.
 - **Model routing.** Three roles, three models. Do not increase model cost or latency beyond this without a material expected benefit:
   - **Fable 5.1 — planning and reviewing.** The main session (this cannot be switched by code; Akash sets it with `/model`). All specs, plans, design decisions, reading Codex findings, final-diff judgment, and anything that changes an interface stay here.
   - **Opus 5.5 — execution.** Every Agent or Workflow agent that writes code, tests, migrations or docs passes `model: "opus"` explicitly. Cheaper models (`model: "sonnet"` or `"haiku"`) only for pure search/grep/summarise steps.
-  - **Codex Astra (`gpt-6-astra`) — independent review.** Every Codex call passes `model: "gpt-6-astra"` explicitly (also the default in `~/.codex/config.toml`). Used for the review checkpoints and independent diagnosis when a patch loop is stopped; never for execution.
+  - **Codex Astra (`gpt-6-astra`) — independent review.** The plugin's review has no per-call model flag: the model is the `model` line in `~/.codex/config.toml`, which must read `gpt-6-astra` (check it after any Codex update; the 0.162 update silently switched it to `gpt-6-sol`). Pass `--model gpt-6-astra` where a flag exists (`/codex:rescue`). Used for the review checkpoints and independent diagnosis when a patch loop is stopped; never for execution.
   - At the end of any session that spawned agents or called Codex, report `/cost` and one line on where tokens went.
 - **Investigate independently first.** Before consulting Codex, understand the requirement, inspect the relevant repository evidence, identify the likely implementation boundary, and form an independent technical opinion. Ask Codex to investigate or falsify assumptions, not merely to validate Claude's conclusion.
 - **Use Codex selectively.** Consult Codex when independent reasoning materially improves correctness, security, architecture, debugging, or reliability. Do not invoke it for trivial text, styling, formatting, renaming, documentation, or obvious one-line changes.
@@ -50,7 +50,7 @@ CLAUDE.md. No personal memory or project context lives here.
 - **One review round.** Codex reviews the whole final diff once, in parallel with rendered screenshots; one fix
   round; a second Codex look only for fixes touching auth/RLS/migrations/money. Leftovers go to the release
   gate, never another round. Code quality stays non-negotiable: tests, types, lint and the Codex review all run.
-- **Check Codex quota at the start** of the review step; if it is exhausted, tell Akash immediately.
+- **Check Codex quota at the start** of the review step with one tiny `codex exec --skip-git-repo-check -s read-only "Reply OK"`; if it is exhausted, tell Akash immediately.
 - **Time box.** At 1.5× the track budget, stop and tell Akash why, with options. Watch any running workflow
   every ~10 min and stop it on a second build round or a runaway fix loop.
 - **Missing production data is a release-time check,** never a reason to rebuild.
@@ -74,7 +74,7 @@ Akash should never need to know that /goal, /loop, or /schedule exist. At these 
 - If a plugin or skill description claims broader scope than this (e.g. "use for any webpage"), this hierarchy wins.
 
 # One tool per job
-- Spec → `/spec` · ideas → `/office-hours` · diff review → `/code-review` + Codex MCP · security → `/security-review` · web QA → `/qa` · visual QA → `/design-review` · browsing → `/browse` · scraping/search → firecrawl.
+- Spec → `/spec` · ideas → `/office-hours` · diff review → `/code-review` + `/codex:review` · security → `/security-review` · web QA → `/qa` · visual QA → `/design-review` · browsing → `/browse` · scraping/search → firecrawl.
 - Unused gstack skills are `"off"` in `skillOverrides` (settings.shared.json). Re-enable one only when a real task needs it; don't add a second tool for a job that already has one.
 
 # Dynamic workflows
