@@ -112,6 +112,7 @@ changed from outside. To pull there, run `git pull` manually — a deliberate ac
 | `CLAUDE.md`            | The shared rulebook, imported into each machine's global config: how to work with Akash, writing format, plan-then-execute, model routing (Fable plans, Opus executes, Codex reviews), delivery speed, loop reflexes, web access, one tool per job |
 | `skills/`              | Custom skills, one folder each with a `SKILL.md`. `skills/_template/` is the starter (underscore folders are not synced) |
 | `agents/`              | Custom agent definitions, one `.md` each. `Explore.md` pins the search agent to Haiku |
+| `templates/`           | Fill-in briefs to copy into a project. `codex-browser-qa-brief.md` is a full browser QA brief for Codex |
 | `settings.shared.json` | Baseline settings: deny rules, plugins on and off, gstack skills turned off, marketplaces, the sync hook, and the defaults `defaultMode: auto`, `effortLevel: high`, `skipWorkflowUsageWarning: true` |
 | `sync.sh`              | Runs on every launch. Links skills and agents, removes links to things deleted from the repo, warns on settings drift. On receiver machines it also pulls and rebuilds gstack when stale |
 | `drift-check.py`       | The drift rules. Reports what a machine is missing from the shared settings. Extra personal plugins, marketplaces, allows and hooks are fine |
