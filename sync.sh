@@ -55,6 +55,19 @@ if [ -d "$AGENTS_SRC" ]; then
   done
 fi
 
+# 2c. Remove links that point into this repo at something no longer there
+#     (a skill or agent that was deleted or renamed). Links to anywhere else
+#     are never touched.
+for dst in "$SKILLS_DST" "$AGENTS_DST"; do
+  [ -d "$dst" ] || continue
+  for link in "$dst"/*; do
+    [ -L "$link" ] && [ ! -e "$link" ] || continue
+    case "$(readlink "$link")" in
+      "$REPO"/*) rm -f "$link" && echo "sync: removed stale link $(basename "$link")" >&2 ;;
+    esac
+  done
+done
+
 # 3. Keep gstack's runtime fresh. On receiver machines, `git pull` above can
 #    advance gstack's sources without rebuilding the compiled browse/design/pdf
 #    binaries — so /browse, /qa etc. would silently break. Rebuild only when the
@@ -78,52 +91,10 @@ if [ -f "$REPO/.autopull" ] && [ -x "$GSTACK_DIR/setup" ] && command -v bun >/de
   fi
 fi
 
-# 4. Drift check: warn when the shared portions of live settings diverge from
-#    settings.shared.json (deny rules, plugins, marketplaces, effort). The live
-#    file may hold EXTRA machine-personal keys (model, tui, notifications) —
-#    only the shared keys are compared. Warning only; nothing is auto-changed.
-if [ -f "$HOME/.claude/settings.json" ] && [ -f "$REPO/settings.shared.json" ]; then
-  python3 - "$REPO/settings.shared.json" "$HOME/.claude/settings.json" <<'PY' >&2 || true
-import json, sys
-shared = json.load(open(sys.argv[1])); live = json.load(open(sys.argv[2]))
-drift = []
-for key in ("extraKnownMarketplaces", "effortLevel"):
-    if key in shared and shared[key] != live.get(key):
-        drift.append(key)
-# Permissions: deny rules and mode must match exactly. Machines may ADD
-# personal allows (e.g. deploy/merge on the owner's Mac, never on shared boxes);
-# only require that every shared allow is still present.
-sp, lp = shared.get("permissions", {}), live.get("permissions", {})
-for key, want in sp.items():
-    if key == "allow":
-        if not set(want) <= set(lp.get("allow", [])):
-            drift.append("permissions.allow")
-    elif lp.get(key) != want:
-        drift.append(f"permissions.{key}")
-for key in lp:
-    if key not in sp and key != "allow":
-        drift.append(f"permissions.{key}")
-# Plugins: shared is the login-free BASELINE; machines may enable extra
-# credential-gated plugins (firecrawl/supabase/vercel) personally. Only the
-# plugins named in shared must match (incl. explicit `false` entries).
-live_so = live.get("skillOverrides", {})
-for name, want in shared.get("skillOverrides", {}).items():
-    if live_so.get(name) != want:
-        drift.append(f"skillOverrides.{name}")
-live_plugins = live.get("enabledPlugins", {})
-for name, want in shared.get("enabledPlugins", {}).items():
-    if live_plugins.get(name, False) != want:
-        drift.append(f"enabledPlugins.{name}")
-# Hooks: machines may ADD personal hooks (e.g. AgentPeek); only require that
-# every shared hook command is still present on its event.
-live_hooks = live.get("hooks", {})
-for event, groups in shared.get("hooks", {}).items():
-    live_cmds = {h.get("command") for g in live_hooks.get(event, []) for h in g.get("hooks", [])}
-    for g in groups:
-        for h in g.get("hooks", []):
-            if h.get("command") not in live_cmds:
-                drift.append(f"hooks.{event}")
-if drift:
-    print(f"sync: DRIFT between settings.shared.json and ~/.claude/settings.json in: {', '.join(drift)} — reconcile and commit suryavanshi-claude.")
-PY
+# 4. Drift check: warn when this machine is missing something the shared
+#    settings ask for. A machine may ADD its own plugins, marketplaces, allows
+#    and hooks; drift-check.py holds the rules. Warning only, nothing changes.
+if [ -f "$HOME/.claude/settings.json" ] && [ -f "$REPO/settings.shared.json" ] && [ -f "$REPO/drift-check.py" ]; then
+  drift="$(python3 "$REPO/drift-check.py" "$REPO/settings.shared.json" "$HOME/.claude/settings.json" 2>&1)" \
+    || echo "sync: $drift — reconcile and commit suryavanshi-claude." >&2
 fi

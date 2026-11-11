@@ -74,6 +74,27 @@ else
   crit "shared CLAUDE.md import missing from $GLOBAL_MD"
 fi
 
+# The shared hook calls ~/suryavanshi-claude/sync.sh by that exact path. A
+# clone anywhere else looks healthy but never syncs.
+if [ "$REPO" = "$HOME/suryavanshi-claude" ]; then pass "repo is at ~/suryavanshi-claude (the path the sync hook calls)"
+else crit "repo is at $REPO — the sync hook calls ~/suryavanshi-claude/sync.sh, so auto-sync is dead here. Move the clone."; fi
+
+# Settings drift: this machine is missing something the shared file asks for.
+if [ -f "$SETTINGS" ] && have python3; then
+  if drift="$(python3 "$REPO/drift-check.py" "$REPO/settings.shared.json" "$SETTINGS" 2>&1)"; then
+    pass "live settings carry every shared setting"
+  else note "$drift"; fi
+fi
+
+# Codex review model. The rulebook needs gpt-6-astra, and a Codex update has
+# changed this line before. Checked only where Codex is set up.
+CODEX_CFG="$HOME/.codex/config.toml"
+if [ -f "$CODEX_CFG" ]; then
+  codex_model="$(sed -n 's/^model[[:space:]]*=[[:space:]]*"\(.*\)".*/\1/p' "$CODEX_CFG" | head -1)"
+  if [ "$codex_model" = "gpt-6-astra" ]; then pass "Codex review model is gpt-6-astra"
+  else note "Codex model is '${codex_model:-unset}', the rulebook expects gpt-6-astra (edit the model line in $CODEX_CFG)"; fi
+fi
+
 # ── Custom skills ─────────────────────────────────────────────
 printf '\n%sCustom skills%s\n' "$BOLD" "$RST"
 linked=0; missing=0
@@ -84,6 +105,14 @@ for d in "$REPO"/skills/*/; do
   else note "$n NOT linked"; missing=$((missing+1)); fi
 done
 [ "$linked" -eq 0 ] && [ "$missing" -eq 0 ] && note "no custom skills in repo yet"
+
+# Custom agents
+for f in "$REPO"/agents/*.md; do
+  [ -f "$f" ] || continue
+  n="$(basename "$f")"
+  if [ -e "$CLAUDE_DIR/agents/$n" ]; then pass "agent ${n%.md} linked"
+  else note "agent ${n%.md} NOT linked (run ./sync.sh)"; fi
+done
 
 # Skill runtime dependencies (checked only while the skill ships in this repo)
 if [ -d "$REPO/skills/markitdown" ]; then

@@ -91,40 +91,48 @@ else
 fi
 
 # ── 2/7 Plugin marketplaces ───────────────────────────────────
+# Marketplaces and plugins are read from settings.shared.json, so this script
+# never lists a plugin the shared settings have since turned off.
 step "2/7 Plugin marketplaces"
-if have claude; then
-  for m in anthropics/claude-plugins-official obra/superpowers-marketplace forrestchang/andrej-karpathy-skills; do
+SHARED="$REPO/settings.shared.json"
+shared_list() {  # $1 = marketplaces | plugins
+  python3 - "$SHARED" "$1" <<'PY'
+import json, sys
+d = json.load(open(sys.argv[1]))
+if sys.argv[2] == "marketplaces":
+    for m in d.get("extraKnownMarketplaces", {}).values():
+        src = m.get("source", {})
+        if src.get("source") == "github" and src.get("repo"):
+            print(src["repo"])
+else:
+    for name, on in d.get("enabledPlugins", {}).items():
+        if on is True:
+            print(name)
+PY
+}
+if have claude && have python3 && [ -f "$SHARED" ]; then
+  while IFS= read -r m; do
+    [ -n "$m" ] || continue
     if claude plugin marketplace add "$m" >/dev/null 2>&1; then ok "marketplace $m"
     else softwarn "marketplace $m (already added or transient error)"; fi
-  done
+  done < <(shared_list marketplaces)
 else
-  softwarn "skipped (no claude CLI)"
+  softwarn "skipped (needs claude CLI, python3 and settings.shared.json)"
 fi
 
 # ── 3/7 Plugins ───────────────────────────────────────────────
 step "3/7 Plugins"
-# Login-free plugins enabled for everyone. The credential-gated ones
-# (firecrawl=API key, supabase=token, vercel=login) are intentionally NOT here —
-# they prompt each teammate for personal auth. Enable them yourself if you have
-# the credentials: `claude plugin install <name>@claude-plugins-official`.
-# playwright is intentionally absent too: /browse (gstack) is our browser stack,
-# and settings.shared.json pins playwright off to avoid a third browsing system.
-PLUGINS=(
-  superpowers@claude-plugins-official
-  frontend-design@claude-plugins-official
-  swift-lsp@claude-plugins-official
-  rust-analyzer-lsp@claude-plugins-official
-  claude-md-management@claude-plugins-official
-  claude-code-setup@claude-plugins-official
-  andrej-karpathy-skills@karpathy-skills
-)
-if have claude; then
-  for p in "${PLUGINS[@]}"; do
+# Only the plugins that settings.shared.json enables. Plugins that need a
+# personal login (firecrawl, supabase, vercel, codex) are not in the shared
+# file; enable those yourself: `claude plugin install <name>@<marketplace>`.
+if have claude && have python3 && [ -f "$SHARED" ]; then
+  while IFS= read -r p; do
+    [ -n "$p" ] || continue
     if claude plugin install "$p" >/dev/null 2>&1; then ok "$p"
     else softwarn "$p (already installed or transient error)"; fi
-  done
+  done < <(shared_list plugins)
 else
-  softwarn "skipped (no claude CLI)"
+  softwarn "skipped (needs claude CLI, python3 and settings.shared.json)"
 fi
 
 # ── 4/7 gstack: clone + BUILD (the part that was missing) ─────
@@ -159,7 +167,6 @@ fi
 
 # ── 5/7 settings.json (deep-merged, non-destructive) ──────────
 step "5/7 settings.json (deep-merged, non-destructive)"
-SHARED="$REPO/settings.shared.json"
 TARGET="$CLAUDE_DIR/settings.json"
 if have python3 && [ -f "$SHARED" ]; then
   [ -f "$TARGET" ] && cp "$TARGET" "$TARGET.bak.$(date +%s)" 2>/dev/null || true
@@ -191,7 +198,7 @@ else
 fi
 
 # ── 6/7 Shared CLAUDE.md import + skill links ─────────────────
-step "6/7 Shared CLAUDE.md import + skill links"
+step "6/7 Shared CLAUDE.md import + skill and agent links"
 GLOBAL_MD="$CLAUDE_DIR/CLAUDE.md"
 IMPORT_LINE="@$REPO/CLAUDE.md"
 touch "$GLOBAL_MD"
@@ -206,7 +213,7 @@ fi
 # Mark this as a receiver machine so the SessionStart hook auto-pulls here.
 touch "$REPO/.autopull" && ok "auto-pull enabled on this machine (.autopull marker)"
 
-if bash "$REPO/sync.sh"; then ok "custom skills linked (sync.sh)"
+if bash "$REPO/sync.sh"; then ok "custom skills and agents linked (sync.sh)"
 else softwarn "sync.sh reported a problem (see above)"; fi
 
 # ── 7/7 Verify end state ──────────────────────────────────────

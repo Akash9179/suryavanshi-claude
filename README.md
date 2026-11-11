@@ -28,7 +28,7 @@ Set up my Claude Code environment from the suryavanshi-claude shared repo.
    bootstrap prerequisites (installing bun and the markitdown CLI if missing), install the login-free
    plugins, clone AND BUILD gstack (compiling its browse runtime for this
    machine), deep-merge settings.shared.json into ~/.claude/settings.json, add the
-   shared CLAUDE.md import, link custom skills, and install the auto-pull hook.
+   shared CLAUDE.md import, link custom skills and agents, and install the auto-pull hook.
 3. Your goal is a healthy setup: run ./doctor.sh and only report success when it
    exits 0 and prints "👍 GREEN — everything installed and running". If install.sh
    or doctor.sh reports a problem, stop and show it to me — do NOT claim success
@@ -53,7 +53,7 @@ you're walking them through it by hand.
 
 **This repo fixes that.** It's a single source of truth that:
 
-- 📦 holds our **custom skills** (one folder each)
+- 📦 holds our **custom skills** and **agents**
 - 📝 holds our **shared working practices** (`CLAUDE.md`)
 - ⚙️ holds a **baseline config** (plugins, marketplaces, safety rules)
 - 🔄 **auto-syncs** to every machine on each Claude Code launch
@@ -90,12 +90,12 @@ the setup gets better over time instead of being reinvented on each laptop.
 ```
 
 A `SessionStart` hook runs [`sync.sh`](./sync.sh) every time Claude Code starts.
-That script symlinks each skill folder into `~/.claude/skills/`, and — on
+That script symlinks each skill folder into `~/.claude/skills/` and each agent
+file into `~/.claude/agents/`, and — on
 **receiver** machines — pulls the latest from GitHub first, so new skills appear
 automatically with no manual step. One caveat: the launch hook silences all of
-`sync.sh`'s output, so its warnings (settings drift, skipped skills, a failed
-gstack rebuild) only show when you run `./sync.sh` — or `./doctor.sh` — by hand
-now and then.
+`sync.sh`'s output, so its warnings (skipped skills, a failed gstack rebuild)
+only show when you run `./sync.sh` by hand. `./doctor.sh` reports settings drift.
 
 **Source vs. receiver machines.** Auto-pull is opt-in per machine, gated by a
 git-ignored `.autopull` marker that `install.sh` creates. Machines set up with
@@ -107,97 +107,88 @@ changed from outside. To pull there, run `git pull` manually — a deliberate ac
 
 ## 📦 What's inside
 
-| Path                     | What it is                                                        |
-| ------------------------ | ----------------------------------------------------------------- |
-| `skills/`                | Custom skills — one folder per skill, each with a `SKILL.md`      |
-| `skills/_template/`      | Starter template for a new skill (underscore folders aren't synced) |
-| `CLAUDE.md`              | Shared working practices imported into each machine's global config: web-access hierarchy, workflow policy, design references, and Akash's interaction preferences |
-| `settings.shared.json`   | Baseline settings: plugins, marketplaces, deny-list safety rules, the sync hook — plus team defaults applied to your machine: `defaultMode: auto`, `effortLevel: high`, `skipWorkflowUsageWarning: true` |
-| `sync.sh`                | Links skills + warns when local settings drift from the shared baseline; on receiver machines it also pulls latest + rebuilds the gstack runtime when stale |
-| `install.sh`             | One-shot setup for a new machine or teammate (idempotent, self-repairing) |
-| `doctor.sh`              | Health-check gate — green 👍 only when everything is built & wired |
-| `list-skills.sh`         | Regenerates the custom-skills list in this README from `skills/`  |
+| Path                   | What it is |
+| ---------------------- | ---------- |
+| `CLAUDE.md`            | The shared rulebook, imported into each machine's global config: how to work with Akash, writing format, plan-then-execute, model routing (Fable plans, Opus executes, Codex reviews), delivery speed, loop reflexes, web access, one tool per job |
+| `skills/`              | Custom skills, one folder each with a `SKILL.md`. `skills/_template/` is the starter (underscore folders are not synced) |
+| `agents/`              | Custom agent definitions, one `.md` each. `Explore.md` pins the search agent to Haiku |
+| `settings.shared.json` | Baseline settings: deny rules, plugins on and off, gstack skills turned off, marketplaces, the sync hook, and the defaults `defaultMode: auto`, `effortLevel: high`, `skipWorkflowUsageWarning: true` |
+| `sync.sh`              | Runs on every launch. Links skills and agents, removes links to things deleted from the repo, warns on settings drift. On receiver machines it also pulls and rebuilds gstack when stale |
+| `drift-check.py`       | The drift rules. Reports what a machine is missing from the shared settings. Extra personal plugins, marketplaces, allows and hooks are fine |
+| `install.sh`           | One-shot setup for a new machine (idempotent, self-repairing). Reads its plugin list from `settings.shared.json` |
+| `doctor.sh`            | Health gate. Green only when everything is built and wired |
+| `test.sh`              | Tests for `sync.sh` and `drift-check.py`, run in a throwaway home folder. Run it after any change to either |
+| `list-skills.sh`       | Regenerates the custom-skills table in this README from `skills/` |
 
 ---
 
 ## 🧰 What you get
 
-Setting up this repo gives every machine the same toolbox. It comes from three
-places:
+### 1. gstack: browser, QA and design tools
 
-### 1. gstack — planning, review, shipping & browser QA
+Cloned into `~/.claude/skills/gstack/`. gstack ships about 60 skills. We keep
+one tool per job, so `settings.shared.json` turns most of them off. The ones we
+use:
 
-Cloned into `~/.claude/skills/gstack/`. A large suite of workflow skills —
-highlights below; gstack ships more (`/office-hours`, `/careful`, `/scrape`,
-`/make-pdf`, `/diagram`, …), so treat this table as a curated sample:
-
-| Area | Skills |
+| Job | Skill |
 | --- | --- |
-| **Plan & review** | `/plan-ceo-review` · `/plan-eng-review` · `/plan-design-review` · `/plan-devex-review` · `/review` · `/autoplan` · `/spec` |
-| **Ship & deploy** | `/ship` · `/land-and-deploy` · `/canary` · `/setup-deploy` |
-| **Design** | `/design-consultation` · `/design-shotgun` · `/design-html` · `/design-review` |
-| **QA & browser** | `/browse` · `/qa` · `/qa-only` · `/connect-chrome` · `/setup-browser-cookies` |
-| **iOS** | `/ios-qa` · `/ios-fix` · `/ios-design-review` · `/ios-sync` · `/ios-clean` |
-| **Ops & misc** | `/investigate` · `/cso` · `/benchmark` · `/retro` · `/document-release` · `/codex` · `/freeze` · `/guard` · `/learn` · `/gstack-upgrade` |
+| Browse and test a running site | `/browse` · `/qa` · `/setup-browser-cookies` |
+| Design | `/design-review` · `/design-shotgun` |
+| Plan | `/spec` · `/office-hours` |
+| Other | `/make-pdf` · `/verify` · `/gstack-upgrade` |
 
-> **Web access hierarchy** (full rule in [`CLAUDE.md`](./CLAUDE.md)): interactive
-> browsing / QA / dogfooding → `/browse` (gstack) · scraping, crawling, web search →
-> firecrawl skills (opt-in plugin) · single quick fetch of a known URL → built-in
-> WebFetch. Never the `claude-in-chrome` MCP tools (denied in shared settings).
+To turn one back on, remove its line from `skillOverrides` in
+`settings.shared.json` and in your `~/.claude/settings.json`.
 
-> For any **design / UI work**, consult [awesome-design-md](https://github.com/voltagent/awesome-design-md)
-> first — real `DESIGN.md` specs pulled from Apple, Airbnb, Linear, Stripe, Vercel and ~80 more — and
-> treat "high quality" / "design review" as a hard bar, defaulting to Apple/Airbnb-grade (light, simple,
-> generous whitespace, one restrained accent). Full rule in [`CLAUDE.md`](./CLAUDE.md).
+> **Web access** (full rule in [`CLAUDE.md`](./CLAUDE.md)): a running site →
+> `/browse`. Scraping and web search → firecrawl. One known URL → WebFetch.
+> Never the `claude-in-chrome` tools (denied in shared settings).
 
-### 2. Plugins — from the official & community marketplaces
+### 2. Plugins
 
-**Enabled for everyone by `install.sh`** (no login or API key required):
+`settings.shared.json` is the list. `install.sh` installs what it enables:
 
 | Plugin | What it adds |
 | --- | --- |
-| **superpowers** | Core engineering workflow: brainstorming, TDD, systematic debugging, writing & executing plans, code review, git worktrees |
-| **frontend-design** | Distinctive, production-grade UI generation |
-| **claude-md-management** | Auditing & improving `CLAUDE.md` files |
-| **claude-code-setup** | Recommendations for hooks, subagents, skills, MCP servers |
-| **andrej-karpathy-skills** | Guidelines to reduce common LLM coding mistakes |
-| **swift-lsp** / **rust-analyzer-lsp** | Language servers for Swift & Rust |
+| **typesafe** | TypeSafe AI building blocks |
+| **swift-lsp** | Language server for Swift |
 
-> **Deliberately disabled: playwright.** `settings.shared.json` pins it off — `/browse`
-> (gstack) is our one browser stack, and carrying a second one meant every session
-> loaded contradictory browsing instructions.
+Pinned **off** on purpose, so they do not come back: superpowers, playwright,
+frontend-design, claude-md-management, claude-code-setup,
+andrej-karpathy-skills, rust-analyzer-lsp.
 
-**Opt-in — NOT enabled by default** (each needs a personal credential, so
-the shared repo leaves them off to keep team onboarding zero-friction). Enable
-any you have a credential for with `claude plugin install <name>@claude-plugins-official`:
+**Opt-in, per machine.** These need a personal login, so the shared file leaves
+them out. Enable with `claude plugin install <name>@<marketplace>`:
 
 | Plugin | What it adds | Needs |
 | --- | --- | --- |
-| **firecrawl** | Web search, scraping, crawling, structured extraction | API key |
-| **supabase** | Database, auth, edge functions, migrations, RLS | access token |
-| **vercel** | Deployment, Next.js, AI SDK, storage, env vars, CLI | account login |
+| **firecrawl** | Web search, scraping, crawling | API key |
+| **codex** (`openai-codex` marketplace) | Independent code review. The rulebook's review step uses it | Codex login |
+| **supabase** | Database, auth, edge functions | access token |
+| **vercel** | Deployment and env vars | account login |
 
-### 3. Custom skills — ours, in this repo
+### 3. Custom skills and agents
 
-Anything we add under [`skills/`](./skills/). Run `./list-skills.sh` to
-regenerate the list below from the `skills/` folder.
+Skills live under [`skills/`](./skills/). Run `./list-skills.sh` to regenerate
+this table.
 
 <!-- SKILLS:START -->
 | Skill | What it does |
 | --- | --- |
-| `/copyedit` | Editorial review of English prose/copy — grammar, clarity, concision, active voice, parallelism, consistency, tone, and AI-slop/cliché detection. Use when reviewing or polishing user-facing copy (landing pages, marketing, docs, UI strings, emails) or when the user asks "is this correct English", "review the copy/writing", "proofread", or "tighten this". |
 | `/design-references` | Use when doing any UI or design work — exploring design ideas, brainstorming a look, building or restyling an interface — or when Akash asks for "high quality" or a design review. |
 | `/executing-hard-tasks` | Use when starting any multi-step or unfamiliar task, when an instruction conflicts with what the code, comments, or tests say, before reporting any work as done, or when blocked and unsure what to do next. |
 | `/markitdown` | Convert any local document or media file to clean Markdown using Microsoft's markitdown. Use when the user hands over a PDF, Word/PowerPoint/Excel file (docx/pptx/xlsx), image, audio file, HTML, CSV/JSON/XML, EPUB, or ZIP and wants its content read, extracted, summarized, or turned into markdown — i.e. "convert this", "read this PDF", "extract the text from", "what's in this file", "turn this doc into markdown". |
 | `/memory-hygiene` | Use when auditing, cleaning, or reorganizing Claude Code auto-memory directories, when memories contradict reality or each other, when a project has moved or been renamed, or when MEMORY.md index lines don't match the files on disk. |
-| `/review-animations` | Reviews animation and motion code against a high craft bar derived from Emil Kowalski's design engineering philosophy. Default to flagging; approval is earned. |
 | `/starting-projects` | Use when creating a new project or repository from scratch — a new app, service, site, or experiment — before writing any feature code. |
 | `/test-driven-development` | Use when implementing any feature or bugfix, before writing implementation code |
-| `/writing-skills` | Use when creating new skills, editing existing skills, or verifying skills work before deployment |
 <!-- SKILLS:END -->
 
-> **`/markitdown`'s CLI** is installed automatically by `install.sh` (via pipx,
-> to `~/.local/bin`) and checked by `doctor.sh`. Manual fallback: `pipx install 'markitdown[all]'`.
+Agents live under [`agents/`](./agents/). `Explore` replaces the built-in
+search agent with one pinned to Haiku, so searches do not run on the session's
+model.
+
+> **`/markitdown`'s CLI** is installed by `install.sh` (via pipx, to
+> `~/.local/bin`) and checked by `doctor.sh`. Manual fallback: `pipx install 'markitdown[all]'`.
 
 ---
 
@@ -211,17 +202,17 @@ cd ~/suryavanshi-claude && ./install.sh
 ```
 
 > **The path matters.** The shared SessionStart hook hardcodes
-> `~/suryavanshi-claude/sync.sh`. Clone anywhere else and everything will *look*
-> fine — `doctor.sh` can even pass — but auto-sync will be silently dead.
+> `~/suryavanshi-claude/sync.sh`. Clone anywhere else and auto-sync is dead.
+> `doctor.sh` goes red when the clone is in the wrong place.
 
 `install.sh` is idempotent and self-repairing (safe to re-run). It will:
 
 1. **Bootstrap prerequisites** — check for `git`, `python3`, and the `claude` CLI, and install **bun** (needed to build gstack's runtime) and the **markitdown CLI** (powers `/markitdown`, via pipx) if they're missing
-2. Add the plugin marketplaces and install the login-free plugins
+2. Add the marketplaces and install the plugins that `settings.shared.json` enables
 3. Clone [gstack](https://github.com/garrytan/gstack) into `~/.claude/skills/` **and run its `./setup`**, which *compiles* the `browse`/`design`/`pdf` binaries for this machine's architecture — without this the gstack skill files exist but nothing runs
 4. Deep-merge `settings.shared.json` into your `~/.claude/settings.json` (a timestamped `.bak` is saved first). Lists are unioned, so personal hooks and extra deny rules survive re-runs; the shared team defaults (`defaultMode: auto`, `effortLevel: high`) overwrite those specific keys, and everything else local is untouched
 5. Import the shared practices into your global `~/.claude/CLAUDE.md`
-6. Link the custom skills and install the auto-pull hook
+6. Link the custom skills and agents and install the auto-pull hook
 7. **Verify** the end state and only report success when every critical piece is in place — otherwise list exactly what failed and exit non-zero
 
 ### Is it actually working? Run the doctor
@@ -274,7 +265,7 @@ committed — they're excluded in [`.gitignore`](./.gitignore):
 
 **A note on MCP servers & personal logins:** the shared repo enables only
 **login-free** plugins by default. The ones that need a personal credential —
-**firecrawl** (API key), **supabase** (token), and **vercel** (login) — are
+**firecrawl** (API key), **codex** (login), **supabase** (token), and **vercel** (login) — are
 intentionally left **off** so no teammate is forced to authenticate to get set
 up. Enable them yourself if you use them (see the opt-in table above); your
 credentials live only on your machine and are never committed. Personal
@@ -294,7 +285,10 @@ and are not part of this repo at all.
 | `sync: skipping '<name>'` warning | A non-symlink with that name already exists in `~/.claude/skills/` (often a gstack skill). Rename your skill to avoid the clash |
 | `/markitdown` fails | Re-run `./install.sh` (installs its CLI via pipx), or: `pipx install 'markitdown[all]'` |
 | Plugins missing after clone | Re-run `./install.sh`, then restart Claude Code |
-| Want firecrawl/supabase/vercel | They're opt-in: `claude plugin install <name>@claude-plugins-official`, then add your credential |
+| Want firecrawl/codex/supabase/vercel | They're opt-in: `claude plugin install <name>@<marketplace>`, then add your credential |
+| A deleted skill still shows up | Run `./sync.sh`. It removes links to things that left the repo |
+| `doctor.sh` notes settings drift | This machine is missing a shared setting. Re-run `./install.sh`, or fix the named key by hand |
+| Changed `sync.sh` or `drift-check.py` | Run `./test.sh` before you push |
 
 ---
 

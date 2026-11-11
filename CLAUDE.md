@@ -81,5 +81,6 @@ Akash should never need to know that /goal, /loop, or /schedule exist. At these 
 # Dynamic workflows
 - Offer a dynamic multi-agent Workflow (the `Workflow` tool), with a one-line shape, for Batch-track work (many independent items) or unknown-size discovery, and wait for a yes. A single feature stays in-session (see Delivery speed). Say plainly when a workflow would be overkill (single-file/one-off/trivial).
 
-# Custom skills
-- Custom skills live in this repo under `skills/` and are symlinked into `~/.claude/skills/`. Run `~/suryavanshi-claude/sync.sh` after adding one.
+# Custom skills and agents
+- Custom skills live in this repo under `skills/` and custom agents under `agents/`. They are symlinked into `~/.claude/skills/` and `~/.claude/agents/`. Run `~/suryavanshi-claude/sync.sh` after adding one.
+- After a change to `sync.sh` or `drift-check.py`, run `~/suryavanshi-claude/test.sh` and `./doctor.sh` before pushing.
