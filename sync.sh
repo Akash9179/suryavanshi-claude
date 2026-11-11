@@ -37,6 +37,24 @@ for dir in "$SKILLS_SRC"/*/; do
   fi
 done
 
+# 2b. Link each custom agent definition into ~/.claude/agents/.
+AGENTS_SRC="$REPO/agents"
+AGENTS_DST="$HOME/.claude/agents"
+if [ -d "$AGENTS_SRC" ]; then
+  mkdir -p "$AGENTS_DST"
+  for file in "$AGENTS_SRC"/*.md; do
+    [ -f "$file" ] || continue
+    link="$AGENTS_DST/$(basename "$file")"
+    if [ -L "$link" ]; then
+      ln -sfn "$file" "$link"
+    elif [ -e "$link" ]; then
+      echo "sync: skipping agent '$(basename "$file")' — a non-symlink already exists at $link" >&2
+    else
+      ln -s "$file" "$link"
+    fi
+  done
+fi
+
 # 3. Keep gstack's runtime fresh. On receiver machines, `git pull` above can
 #    advance gstack's sources without rebuilding the compiled browse/design/pdf
 #    binaries — so /browse, /qa etc. would silently break. Rebuild only when the
